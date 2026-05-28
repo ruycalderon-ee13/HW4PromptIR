@@ -48,11 +48,10 @@ class PromptIRModel(pl.LightningModule):
         loss = self.loss_fn(restored, clean_patch)
 
         restored = torch.clamp(restored, 0.0, 1.0)
-        psnr, ssim, n = compute_psnr_ssim(restored, clean_patch)
+        psnr, n = compute_psnr_ssim(restored, clean_patch)
 
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("val_psnr", psnr, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("val_ssim", ssim, on_step=False, on_epoch=True, prog_bar=False)
     
     def lr_scheduler_step(self,scheduler,metric):
         scheduler.step(self.current_epoch)

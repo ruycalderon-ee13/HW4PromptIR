@@ -55,15 +55,15 @@ def compute_psnr_ssim(recoverd, clean):
     recoverd = recoverd.transpose(0, 2, 3, 1)
     clean = clean.transpose(0, 2, 3, 1)
     psnr = 0
-    ssim = 0
+    #ssim = 0
 
     for i in range(recoverd.shape[0]):
         # psnr_val += compare_psnr(clean[i], recoverd[i])
         # ssim += compare_ssim(clean[i], recoverd[i], multichannel=True)
         psnr += peak_signal_noise_ratio(clean[i], recoverd[i], data_range=1)
-        ssim += structural_similarity(clean[i], recoverd[i], data_range=1, multichannel=True)
+        #ssim += structural_similarity(clean[i], recoverd[i], data_range=1, multichannel=True)
 
-    return psnr / recoverd.shape[0], ssim / recoverd.shape[0], recoverd.shape[0]
+    return psnr / recoverd.shape[0], recoverd.shape[0] #ssim / recoverd.shape[0],
 
 
 def compute_niqe(image):
