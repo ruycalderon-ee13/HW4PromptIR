@@ -1598,4 +1598,3 @@ rainy/rain-996.png
 rainy/rain-997.png
 rainy/rain-998.png
 rainy/rain-999.png
-rainy/rainTrainy/rain.txt

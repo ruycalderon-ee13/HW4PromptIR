@@ -10,9 +10,9 @@ import torch
 
 from utils.image_utils import random_augmentation, crop_img
 
-    
+
 class PromptTrainDataset(Dataset):
-    def __init__(self, args):
+    def __init__(self, args, rain_subset, snow_subset, multiplicity, split):
         super(PromptTrainDataset, self).__init__()
         self.args = args
         self.rs_ids = []
@@ -20,10 +20,13 @@ class PromptTrainDataset(Dataset):
         self.de_temp = 0
         self.de_type = self.args.de_type
         print(self.de_type)
-        #3 is original rerain, prototype for derain and desnow
+
+        self.sample_multiplicity = multiplicity
+        self.split = split
+
         self.de_dict = {'derain': 0, 'desnow': 1}
 
-        self._init_ids()
+        self._init_ids(rain_subset, snow_subset)
         self._merge_ids()
 
         self.crop_transform = Compose([
@@ -33,31 +36,25 @@ class PromptTrainDataset(Dataset):
 
         self.toTensor = ToTensor()
 
-    def _init_ids(self):
+    def _init_ids(self, rain_subset, snow_subset):
         if 'derain' in self.de_type:
-            self._init_rs_ids()
+            self._init_rs_ids(rain_subset)
         if 'desnow' in self.de_type:
-            self._init_sn_ids()
+            self._init_sn_ids(snow_subset)
 
         random.shuffle(self.de_type)
 
-    def _init_rs_ids(self):
-        temp_ids = []
-        rs = self.args.data_file_dir + "rainy/rainTrain.txt"
-        temp_ids+= [self.args.derain_dir + id_.strip() for id_ in open(rs)]
-        self.rs_ids = [{"clean_id":x,"de_type":0} for x in temp_ids]
-        self.rs_ids = self.rs_ids * 8
+    def _init_rs_ids(self, rain_subset):
+        self.rs_ids = [{"clean_id":x,"de_type":0} for x in rain_subset]
+        self.rs_ids = self.rs_ids * self.sample_multiplicity
 
         self.rl_counter = 0
         self.num_rl = len(self.rs_ids)
         print("Total Rainy Ids : {}".format(self.num_rl))
     
-    def _init_sn_ids(self):
-        temp_ids = []
-        sn = self.args.data_file_dir + "snowy/snowTrain.txt"
-        temp_ids+= [self.args.desnow_dir + id_.strip() for id_ in open(sn)]
-        self.sn_ids = [{"clean_id":x,"de_type":1} for x in temp_ids]
-        self.sn_ids = self.sn_ids * 8
+    def _init_sn_ids(self, snow_subset):
+        self.sn_ids = [{"clean_id":x,"de_type":1} for x in snow_subset]
+        self.sn_ids = self.sn_ids * self.sample_multiplicity
 
         self.sl_counter = 0
         self.num_sl = len(self.sn_ids)
@@ -115,8 +112,13 @@ class PromptTrainDataset(Dataset):
             degrad_img = crop_img(np.array(Image.open(sample["clean_id"]).convert('RGB')), base=16)
             clean_name = self._get_gt_name_snowy(sample["clean_id"])
             clean_img = crop_img(np.array(Image.open(clean_name).convert('RGB')), base=16)
-        
-        degrad_patch, clean_patch = random_augmentation(*self._crop_patch(degrad_img, clean_img))
+
+        if self.split == 'train':
+            degrad_patch, clean_patch = random_augmentation(*self._crop_patch(degrad_img, clean_img))
+        elif self.split == 'val':
+            degrad_patch, clean_patch = degrad_img, clean_img
+        else:
+            prit
 
         clean_patch = self.toTensor(clean_patch)
         degrad_patch = self.toTensor(degrad_patch)

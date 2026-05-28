@@ -16,6 +16,9 @@ import lightning.pytorch as pl
 from lightning.pytorch.loggers import WandbLogger,TensorBoardLogger
 from lightning.pytorch.callbacks import ModelCheckpoint
 
+import random
+from utils.val_utils import compute_psnr_ssim
+
 
 class PromptIRModel(pl.LightningModule):
     def __init__(self):
@@ -34,8 +37,22 @@ class PromptIRModel(pl.LightningModule):
 
         loss = self.loss_fn(restored,clean_patch)
         # Logging to TensorBoard (if installed) by default
-        self.log("train_loss", loss)
+
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True,)
         return loss
+
+    def validation_step(self, batch, batch_idx):
+        ([clean_name, de_id], degrad_patch, clean_patch) = batch
+
+        restored = self.net(degrad_patch)
+        loss = self.loss_fn(restored, clean_patch)
+
+        restored = torch.clamp(restored, 0.0, 1.0)
+        psnr, ssim, n = compute_psnr_ssim(restored, clean_patch)
+
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val_psnr", psnr, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val_ssim", ssim, on_step=False, on_epoch=True, prog_bar=False)
     
     def lr_scheduler_step(self,scheduler,metric):
         scheduler.step(self.current_epoch)
@@ -47,22 +64,41 @@ class PromptIRModel(pl.LightningModule):
 
         return [optimizer],[scheduler]
 
-
-
 def main():
     print("Options")
     print(opt)
-    logger = TensorBoardLogger(save_dir = "logs/")
+    logger = TensorBoardLogger(save_dir = opt.log_dir)
 
-    trainset = PromptTrainDataset(opt)
+    rain_ids = [opt.derain_dir + id_.strip() for id_ in open(opt.data_file_dir + "rainy/rainTrain.txt")]
+    snow_ids = [opt.desnow_dir + id_.strip() for id_ in open(opt.data_file_dir + "snowy/snowTrain.txt")]
+    
+    rng = random.Random(42)
+    val_ratio = 0.1
+
+    rain_val_count = int(len(rain_ids) * val_ratio)
+    snow_val_count = int(len(snow_ids) * val_ratio)
+
+    rain_ids_val = set(rng.sample(rain_ids, k=rain_val_count))
+    rain_ids_train = [p for p in rain_ids if p not in rain_ids_val]
+    rain_ids_val = sorted(rain_ids_val)
+
+    snow_ids_val = set(rng.sample(snow_ids, k=snow_val_count))
+    snow_ids_train = [p for p in snow_ids if p not in snow_ids_val]
+    snow_ids_val = sorted(snow_ids_val)
+
+    trainset = PromptTrainDataset(opt, rain_ids_train, snow_ids_train, 8, "train")
+    valset = PromptTrainDataset(opt, rain_ids_val, snow_ids_val, 1, "val")
+
     checkpoint_callback = ModelCheckpoint(dirpath = opt.ckpt_dir,every_n_epochs = 1,save_top_k=-1)
     trainloader = DataLoader(trainset, batch_size=opt.batch_size, pin_memory=True, shuffle=True,
                              drop_last=True, num_workers=opt.num_workers)
+    valloader = DataLoader(valset, batch_size=opt.batch_size, pin_memory=True, shuffle=False,
+                             drop_last=False, num_workers=opt.num_workers)
     
     model = PromptIRModel()
     
-    trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="ddp_find_unused_parameters_true",logger=logger,callbacks=[checkpoint_callback])
-    trainer.fit(model=model, train_dataloaders=trainloader)
+    trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="auto",logger=logger,callbacks=[checkpoint_callback])
+    trainer.fit(model=model, train_dataloaders=trainloader, val_dataloaders=valloader)
 
 
 if __name__ == '__main__':
