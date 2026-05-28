@@ -9,7 +9,6 @@ from torchvision.transforms import ToPILImage, Compose, RandomCrop, ToTensor
 import torch
 
 from utils.image_utils import random_augmentation, crop_img
-from utils.degradation_utils import Degradation
 
     
 class PromptTrainDataset(Dataset):
@@ -18,7 +17,6 @@ class PromptTrainDataset(Dataset):
         self.args = args
         self.rs_ids = []
         self.sn_ids = []
-        self.D = Degradation(args)
         self.de_temp = 0
         self.de_type = self.args.de_type
         print(self.de_type)
