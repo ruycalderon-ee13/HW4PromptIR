@@ -14,8 +14,7 @@ import wandb
 from options import options as opt
 import lightning.pytorch as pl
 from lightning.pytorch.loggers import WandbLogger,TensorBoardLogger
-from lightning.pytorch.callbacks import ModelCheckpoint
-
+from lightning.pytorch.callbacks import ModelCheckpoint, TQDMProgressBar
 import random
 from utils.val_utils import compute_psnr_ssim
 
@@ -96,7 +95,7 @@ def main():
     
     model = PromptIRModel()
     
-    progress_bar = tqdm.TQDMProgressBar(refresh_rate=50)
+    progress_bar = TQDMProgressBar(refresh_rate=50)
 
     trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="auto",logger=logger,callbacks=[checkpoint_callback, progress_bar], log_every_n_steps=50,enable_progress_bar=False,)
     trainer.fit(model=model, train_dataloaders=trainloader, val_dataloaders=valloader)
