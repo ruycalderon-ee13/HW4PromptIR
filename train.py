@@ -96,7 +96,9 @@ def main():
     
     model = PromptIRModel()
     
-    trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="auto",logger=logger,callbacks=[checkpoint_callback], log_every_n_steps=50,enable_progress_bar=False,)
+    progress_bar = TQDMProgressBar(refresh_rate=50)
+
+    trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="auto",logger=logger,callbacks=[checkpoint_callback, progress_bar], log_every_n_steps=50,enable_progress_bar=False,)
     trainer.fit(model=model, train_dataloaders=trainloader, val_dataloaders=valloader)
 
 
