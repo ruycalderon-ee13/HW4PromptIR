@@ -54,7 +54,7 @@ class PromptTrainDataset(Dataset):
         self.num_rl = len(self.rs_ids)
         print("Total Rainy Ids : {}".format(self.num_rl))
     
-     def _init_sn_ids(self):
+    def _init_sn_ids(self):
         temp_ids = []
         rs = self.args.data_file_dir + "rainy/snowTrain.txt"
         temp_ids+= [self.args.derain_dir + id_.strip() for id_ in open(rs)]
