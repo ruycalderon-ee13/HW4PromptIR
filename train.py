@@ -38,7 +38,7 @@ class PromptIRModel(pl.LightningModule):
         loss = self.loss_fn(restored,clean_patch)
         # Logging to TensorBoard (if installed) by default
 
-        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True,)
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=False, logger=True,)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -50,8 +50,8 @@ class PromptIRModel(pl.LightningModule):
         restored = torch.clamp(restored, 0.0, 1.0)
         psnr, n = compute_psnr_ssim(restored, clean_patch)
 
-        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("val_psnr", psnr, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=False)
+        self.log("val_psnr", psnr, on_step=True, on_epoch=True, prog_bar=False)
     
     def lr_scheduler_step(self,scheduler,metric):
         scheduler.step(self.current_epoch)
@@ -96,7 +96,9 @@ def main():
     
     model = PromptIRModel()
     
-    trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="auto",logger=logger,callbacks=[checkpoint_callback])
+    progress_bar = TQDMProgressBar(refresh_rate=50)
+
+    trainer = pl.Trainer( max_epochs=opt.epochs,accelerator="gpu",devices=opt.num_gpus,strategy="auto",logger=logger,callbacks=[checkpoint_callback, progress_bar], log_every_n_steps=50,enable_progress_bar=False,)
     trainer.fit(model=model, train_dataloaders=trainloader, val_dataloaders=valloader)
 
 
