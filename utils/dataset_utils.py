@@ -54,14 +54,14 @@ class PromptTrainDataset(Dataset):
     
     def _init_sn_ids(self):
         temp_ids = []
-        rs = self.args.data_file_dir + "snowy/snowTrain.txt"
-        temp_ids+= [self.args.desnow_dir + id_.strip() for id_ in open(rs)]
-        self.rs_ids = [{"clean_id":x,"de_type":1} for x in temp_ids]
-        self.rs_ids = self.rs_ids * 40
+        sn = self.args.data_file_dir + "snowy/snowTrain.txt"
+        temp_ids+= [self.args.desnow_dir + id_.strip() for id_ in open(sn)]
+        self.sn_ids = [{"clean_id":x,"de_type":1} for x in temp_ids]
+        self.sn_ids = self.sn_ids * 40
 
-        self.rl_counter = 0
-        self.num_rl = len(self.rs_ids)
-        print("Total Snowy Ids : {}".format(self.num_rl))
+        self.sl_counter = 0
+        self.num_sl = len(self.sn_ids)
+        print("Total Snowy Ids : {}".format(self.num_sl))
     
 
     def _crop_patch(self, img_1, img_2):
