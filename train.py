@@ -49,9 +49,6 @@ class PromptIRModel(pl.LightningModule):
 
 
 
-
-
-
 def main():
     print("Options")
     print(opt)

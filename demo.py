@@ -81,7 +81,7 @@ if __name__ == '__main__':
     # Input Parameters
     parser.add_argument('--cuda', type=int, default=0)
     parser.add_argument('--mode', type=int, default=3,
-                        help='0 for denoise, 1 for derain, 2 for dehaze, 3 for all-in-one')
+                        help='0 for derain, 1 for desnow')
 
     parser.add_argument('--test_path', type=str, default="test/demo/", help='save path of test images, can be directory or an image')
     parser.add_argument('--output_path', type=str, default="output/demo/", help='output save path')
