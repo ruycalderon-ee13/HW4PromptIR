@@ -77,7 +77,8 @@ class PromptTrainDataset(Dataset):
 
     def _get_gt_name_rainy(self, rainy_name):
         path_array = rainy_name.split('/')
-        image_id = path_array[-1][5:-4]        
+        image_id = path_array[-1][5:-4]
+        path_array[-2] = "gt"
         path_array[-1] = "".join(["rain_clean-", image_id, ".png"])
         gt_name = "/".join(path_array)
 
@@ -85,7 +86,8 @@ class PromptTrainDataset(Dataset):
 
     def _get_gt_name_snowy(self, rainy_name):
         path_array = rainy_name.split('/')
-        image_id = path_array[-1][5:-4]        
+        image_id = path_array[-1][5:-4]
+        path_array[-2] = "gt"   
         path_array[-1] =  "".join(["snow_clean-", image_id, ".png"])
         gt_name = "/".join(path_array)
 
