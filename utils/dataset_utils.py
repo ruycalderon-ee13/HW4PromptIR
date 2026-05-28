@@ -42,8 +42,6 @@ class PromptTrainDataset(Dataset):
         if 'desnow' in self.de_type:
             self._init_sn_ids(snow_subset)
 
-        random.shuffle(self.de_type)
-
     def _init_rs_ids(self, rain_subset):
         self.rs_ids = [{"clean_id":x,"de_type":0} for x in rain_subset]
         self.rs_ids = self.rs_ids * self.sample_multiplicity
