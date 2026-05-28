@@ -52,10 +52,7 @@ class PromptIRModel(pl.LightningModule):
 def main():
     print("Options")
     print(opt)
-    if opt.wblogger is not None:
-        logger  = WandbLogger(project=opt.wblogger,name="PromptIR-Train")
-    else:
-        logger = TensorBoardLogger(save_dir = "logs/")
+    logger = TensorBoardLogger(save_dir = "logs/")
 
     trainset = PromptTrainDataset(opt)
     checkpoint_callback = ModelCheckpoint(dirpath = opt.ckpt_dir,every_n_epochs = 1,save_top_k=-1)
