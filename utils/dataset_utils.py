@@ -84,8 +84,8 @@ class PromptTrainDataset(Dataset):
 
         return gt_name
 
-    def _get_gt_name_snowy(self, rainy_name):
-        path_array = rainy_name.split('/')
+    def _get_gt_name_snowy(self, snowy_name):
+        path_array = snowy_name.split('/')
         image_id = path_array[-1][5:-4]
         path_array[-2] = "gt"   
         path_array[-1] =  "".join(["snow_clean-", image_id, ".png"])
