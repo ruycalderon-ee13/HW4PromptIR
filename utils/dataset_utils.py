@@ -46,7 +46,7 @@ class PromptTrainDataset(Dataset):
         rs = self.args.data_file_dir + "rainy/rainTrain.txt"
         temp_ids+= [self.args.derain_dir + id_.strip() for id_ in open(rs)]
         self.rs_ids = [{"clean_id":x,"de_type":0} for x in temp_ids]
-        self.rs_ids = self.rs_ids * 40
+        self.rs_ids = self.rs_ids * 8
 
         self.rl_counter = 0
         self.num_rl = len(self.rs_ids)
@@ -57,7 +57,7 @@ class PromptTrainDataset(Dataset):
         sn = self.args.data_file_dir + "snowy/snowTrain.txt"
         temp_ids+= [self.args.desnow_dir + id_.strip() for id_ in open(sn)]
         self.sn_ids = [{"clean_id":x,"de_type":1} for x in temp_ids]
-        self.sn_ids = self.sn_ids * 40
+        self.sn_ids = self.sn_ids * 8
 
         self.sl_counter = 0
         self.num_sl = len(self.sn_ids)
