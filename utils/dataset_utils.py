@@ -38,7 +38,7 @@ class PromptTrainDataset(Dataset):
     def _init_ids(self):
         if 'derain' in self.de_type:
             self._init_rs_ids()
-        if 'snow' in self.de_type:
+        if 'desnow' in self.de_type:
             self._init_sn_ids()
 
         random.shuffle(self.de_type)
@@ -47,7 +47,7 @@ class PromptTrainDataset(Dataset):
         temp_ids = []
         rs = self.args.data_file_dir + "rainy/rainTrain.txt"
         temp_ids+= [self.args.derain_dir + id_.strip() for id_ in open(rs)]
-        self.rs_ids = [{"clean_id":x,"de_type":3} for x in temp_ids]
+        self.rs_ids = [{"clean_id":x,"de_type":0} for x in temp_ids]
         self.rs_ids = self.rs_ids * 120
 
         self.rl_counter = 0
@@ -58,7 +58,7 @@ class PromptTrainDataset(Dataset):
         temp_ids = []
         rs = self.args.data_file_dir + "rainy/snowTrain.txt"
         temp_ids+= [self.args.derain_dir + id_.strip() for id_ in open(rs)]
-        self.rs_ids = [{"clean_id":x,"de_type":3} for x in temp_ids]
+        self.rs_ids = [{"clean_id":x,"de_type":1} for x in temp_ids]
         self.rs_ids = self.rs_ids * 120
 
         self.rl_counter = 0
@@ -103,13 +103,15 @@ class PromptTrainDataset(Dataset):
         if de_id == 0:
             # Rain Streak Removal
             degrad_img = crop_img(np.array(Image.open(sample["clean_id"]).convert('RGB')), base=16)
-            clean_name = self._get_gt_name(sample["clean_id"])
+            clean_name = self._get_gt_name_rainy(sample["clean_id"])
             clean_img = crop_img(np.array(Image.open(clean_name).convert('RGB')), base=16)
         if de_id == 1:
             # snow Removal
             degrad_img = crop_img(np.array(Image.open(sample["clean_id"]).convert('RGB')), base=16)
-            clean_name = self._get_gt_name(sample["clean_id"])
+            clean_name = self._get_gt_name_snowy(sample["clean_id"])
             clean_img = crop_img(np.array(Image.open(clean_name).convert('RGB')), base=16)
+        
+        degrad_patch, clean_patch = random_augmentation(*self._crop_patch(degrad_img, clean_img))
 
         clean_patch = self.toTensor(clean_patch)
         degrad_patch = self.toTensor(degrad_patch)
