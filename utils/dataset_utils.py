@@ -54,7 +54,7 @@ class PromptTrainDataset(Dataset):
     
     def _init_sn_ids(self):
         temp_ids = []
-        rs = self.args.data_file_dir + "rainy/snowTrain.txt"
+        rs = self.args.data_file_dir + "snowy/snowTrain.txt"
         temp_ids+= [self.args.derain_dir + id_.strip() for id_ in open(rs)]
         self.rs_ids = [{"clean_id":x,"de_type":1} for x in temp_ids]
         self.rs_ids = self.rs_ids * 120
