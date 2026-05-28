@@ -76,15 +76,20 @@ class PromptTrainDataset(Dataset):
         return patch_1, patch_2
 
     def _get_gt_name_rainy(self, rainy_name):
-        image_id = rainy_name[5:-4] 
-        gt_name = "".join(["rain_clean-", image_id, ".png"])
+        path_array = rainy_name.split('/')
+        image_id = path_array[-1][5:-4]        
+        path_array[-1] = "".join(["rain_clean-", image_id, ".png"])
+        gt_name = "/".join(path_array)
+
         return gt_name
 
     def _get_gt_name_snowy(self, rainy_name):
-        image_id = rainy_name[5:-4] 
-        gt_name = "".join(["snow_clean-", image_id, ".png"])
-        return gt_name
+        path_array = rainy_name.split('/')
+        image_id = path_array[-1][5:-4]        
+        path_array[-1] =  "".join(["snow_clean-", image_id, ".png"])
+        gt_name = "/".join(path_array)
 
+        return gt_name
 
     def _merge_ids(self):
         self.sample_ids = []
