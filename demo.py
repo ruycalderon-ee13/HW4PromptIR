@@ -90,7 +90,6 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
 
-    ckpt_path = "ckpt/" + opt.ckpt_name
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -103,7 +102,7 @@ if __name__ == '__main__':
     # Make network
     if torch.cuda.is_available():
         torch.cuda.set_device(opt.cuda)
-    net  = PromptIRModel.load_from_checkpoint(ckpt_path).to(device)
+    net  = PromptIRModel.load_from_checkpoint(opt.ckpt_name).to(device)
     net.eval()
 
     test_set = TestSpecificDataset(opt)
