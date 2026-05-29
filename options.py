@@ -13,7 +13,7 @@ parser.add_argument('--de_type', nargs='+', default=['derain', 'desnow'],
                     help='which type of degradations is training and testing for.')
 
 parser.add_argument('--patch_size', type=int, default=64, help='patchsize of input.')
-parser.add_argument('--num_workers', type=int, default=4, help='number of workers.')
+parser.add_argument('--num_workers', type=int, default=8, help='number of workers.')
 
 # path
 parser.add_argument('--data_file_dir', type=str, default='data_dir/',  help='where clean images of denoising saves.')
