@@ -46,7 +46,7 @@ class PromptIRModel(pl.LightningModule):
         ([clean_name, de_id], degrad_patch, clean_patch) = batch
 
         restored = self.net(degrad_patch)
-        loss = self.loss_fn(restored, clean_patch) + self.mse_lambda * self.mse_loss(restored, clean_patch)
+        loss = self.l1_loss(restored, clean_patch) + self.mse_lambda * self.mse_loss(restored, clean_patch)
 
         restored = torch.clamp(restored, 0.0, 1.0)
         psnr, n = compute_psnr_ssim(restored, clean_patch)
