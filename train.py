@@ -25,7 +25,7 @@ class PromptIRModel(pl.LightningModule):
         self.net = PromptIR(decoder=True)
         self.l1_loss = nn.L1Loss()
         self.mse_loss = nn.MSELoss()
-        self.mse_lambda = 0.1
+        self.mse_lambda = 0.0
     
     def forward(self,x):
         return self.net(x)
