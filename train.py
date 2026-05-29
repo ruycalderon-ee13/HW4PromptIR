@@ -23,7 +23,9 @@ class PromptIRModel(pl.LightningModule):
     def __init__(self):
         super().__init__()
         self.net = PromptIR(decoder=True)
-        self.loss_fn  = nn.L1Loss()
+        self.l1_loss = nn.L1Loss()
+        self.mse_loss = nn.MSELoss()
+        self.mse_lambda = 0.1
     
     def forward(self,x):
         return self.net(x)
@@ -34,7 +36,7 @@ class PromptIRModel(pl.LightningModule):
         ([clean_name, de_id], degrad_patch, clean_patch) = batch
         restored = self.net(degrad_patch)
 
-        loss = self.loss_fn(restored,clean_patch)
+        loss = self.l1_loss(restored,clean_patch) + self.mse_lambda * self.mse_loss(restored, clean_patch)
         # Logging to TensorBoard (if installed) by default
 
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=False, logger=True,)
@@ -44,7 +46,7 @@ class PromptIRModel(pl.LightningModule):
         ([clean_name, de_id], degrad_patch, clean_patch) = batch
 
         restored = self.net(degrad_patch)
-        loss = self.loss_fn(restored, clean_patch)
+        loss = self.loss_fn(restored, clean_patch) + self.mse_lambda * self.mse_loss(restored, clean_patch)
 
         restored = torch.clamp(restored, 0.0, 1.0)
         psnr, n = compute_psnr_ssim(restored, clean_patch)
