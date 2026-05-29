@@ -246,7 +246,7 @@ class PromptIR(nn.Module):
         inp_channels=3, 
         out_channels=3, 
         dim = 48,
-        num_blocks = [2,2,2,4], 
+        num_blocks = [2,3,3,5], 
         num_refinement_blocks = 2,
         heads = [1,2,4,8],
         ffn_expansion_factor = 2.66,
