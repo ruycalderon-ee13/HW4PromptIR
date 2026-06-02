@@ -12,7 +12,7 @@ parser.add_argument('--lr', type=float, default=2e-4, help='learning rate of enc
 parser.add_argument('--de_type', nargs='+', default=['derain', 'desnow'],
                     help='which type of degradations is training and testing for.')
 
-parser.add_argument('--patch_size', type=int, default=96, help='patchsize of input.')
+parser.add_argument('--patch_size', type=int, default=48, help='patchsize of input.')
 parser.add_argument('--num_workers', type=int, default=8, help='number of workers.')
 
 # path
